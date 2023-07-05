@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RegisterController;
 use App\Models\Post;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
@@ -16,24 +17,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $files = File::files(resource_path("posts"));
-    $posts = [];
-
-    foreach ($files as $file) {
-        $documents = \Spatie\YamlFrontMatter\YamlFrontMatter::parseFile($file);;
-
-        $posts[] = new Post(
-            $documents->title,
-            $documents->excerpt,
-            $documents->date,
-            $documents->body(),
-            $documents->slug
-        );
-    }
-
-
     return view('posts', [
-        'posts' => $posts
+        'posts' => Post::all()
     ]);
 });
 
@@ -43,3 +28,6 @@ Route::get('posts/{post}', function ($slug) {
         'post' => \App\Models\Post::find($slug)
     ]);
 })->where('post', '[A-z_\-]+');
+
+Route::get('register', [RegisterController::class, 'create']);
+Route::post('register', [RegisterController::class, 'store']);
